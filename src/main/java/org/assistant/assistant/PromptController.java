@@ -2,7 +2,10 @@ package org.assistant.assistant;
 
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.openai.OpenAiChatModel;
+import dev.langchain4j.model.output.structured.Description;
 import dev.langchain4j.service.AiServices;
+import dev.langchain4j.service.SystemMessage;
+import dev.langchain4j.service.UserMessage;
 import org.assistant.assistant.rag.DocumentRetriever;
 import org.assistant.assistant.tools.CurrentInformationRetrieverService;
 import org.assistant.assistant.tools.EnvironmentRecognizerService;
@@ -15,8 +18,31 @@ import static java.time.Duration.ofSeconds;
 
 public class PromptController {
 
+    public enum INTENT {
+
+        @Description("An intent of solely conversing or asking questions.")
+        CONVERSATIONAL,
+
+        @Description("An intent of solely performing an action or command. An action can only be one of the following: " +
+                "1. Capturing an image of the environment" +
+                "2. Retrieving current information such news, weather or date/time." +
+                "3. Controlling external smart devices such as an outlet or bulb.")
+        ACTION
+    }
+
     interface Assistant {
         String chat(String message);
+    }
+
+    interface IntentControllerAssistant {
+
+        @UserMessage("Your role is to specify the intent of a given query for a smart home assistant with camera: {{it}}. " +
+                "An intent can only be NOT_SUPPORTED or ACTION. Return only either of those and a confidence score." +
+                "An action can ONLY be one or related to one of the following. Anything that does not appear from below is NOT an action" +
+                "1. Ability to see" +
+                "2. Retrieving the news, weather or date/time" +
+                "3. Controlling external smart devices such as an outlet or bulb.")
+        String specifyIntent(String text);
     }
 
     public static void main(String[] args) {
@@ -24,7 +50,8 @@ public class PromptController {
         var model = OpenAiChatModel.builder()
                 .apiKey(System.getenv("OPENAI_API_KEY"))
                 .timeout(ofSeconds(200))
-                .logRequests(true)
+                //.logRequests(true)
+                //.logResponses(true)
                 .build();
 
         var assistant = AiServices.builder(Assistant.class)
@@ -36,6 +63,8 @@ public class PromptController {
                 .contentRetriever(DocumentRetriever.get())
                 .build();
 
+        var intentAssistant = AiServices.create(IntentControllerAssistant.class, model);
+
         List<String> queries = Arrays.asList(
                 "Can you turn on the lights please?",
                 "What's the weather today?",
@@ -43,11 +72,15 @@ public class PromptController {
                 "Why is the sky blue?",
                 "What can you see?",
                 "What's today again?",
-                "What are EAC's linkages?"
+                "Describe the room you are in",
+                "What are Emilio Aguinaldo College's linkages?"
         );
 
         for(String s: queries) {
-            System.out.println("[USER]: " + s + "\nLLM: " + assistant.chat(s) + "\n");
+            System.out.println("[USER]: " + s + "\n[LLM]: " +
+                    intentAssistant.specifyIntent(s) +
+                    //assistant.chat(s) +
+                    "\n");
         }
     }
 
