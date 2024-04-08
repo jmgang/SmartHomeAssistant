@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static java.time.Duration.ofSeconds;
+import static org.assistant.config.ConfigLoader.getProperty;
 
 public class PromptController {
 
@@ -48,7 +49,7 @@ public class PromptController {
     public static void main(String[] args) {
 
         var model = OpenAiChatModel.builder()
-                .apiKey(System.getenv("OPENAI_API_KEY"))
+                .apiKey(getProperty("assistant.openai.apikey"))
                 .timeout(ofSeconds(200))
                 //.logRequests(true)
                 //.logResponses(true)
@@ -60,26 +61,27 @@ public class PromptController {
                         new EnvironmentRecognizerService(),
                         new SmartOutletManagerService())
                 .chatMemory(MessageWindowChatMemory.withMaxMessages(10))
-                .contentRetriever(DocumentRetriever.get())
+                //.contentRetriever(DocumentRetriever.get())
                 .build();
 
         var intentAssistant = AiServices.create(IntentControllerAssistant.class, model);
 
         List<String> queries = Arrays.asList(
-                "Can you turn on the lights please?",
-                "What's the weather today?",
-                "Give me the latest news",
-                "Why is the sky blue?",
-                "What can you see?",
-                "What's today again?",
-                "Describe the room you are in",
-                "What are Emilio Aguinaldo College's linkages?"
+                "Can you turn on the lights please?"
+//                , "What's the weather today?"
+                , "Give me a brief view of the news today"
+//                , "Why is the sky blue?"
+//                , "What can you see?"
+//                , "What's today again?"
+//                , "Describe the room you are in"
+//                , "What are Emilio Aguinaldo College's linkages?"
         );
+
 
         for(String s: queries) {
             System.out.println("[USER]: " + s + "\n[LLM]: " +
-                    intentAssistant.specifyIntent(s) +
-                    //assistant.chat(s) +
+                    //intentAssistant.specifyIntent(s) +
+                    assistant.chat(s) +
                     "\n");
         }
     }

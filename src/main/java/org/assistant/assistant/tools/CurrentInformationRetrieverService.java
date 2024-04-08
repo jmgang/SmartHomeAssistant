@@ -1,36 +1,33 @@
 package org.assistant.assistant.tools;
 
 import dev.langchain4j.agent.tool.Tool;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import org.assistant.api.news.News;
+import org.assistant.api.news.NewsRetriever;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class CurrentInformationRetrieverService {
 
     @Tool("Retrieves the latest news.")
     public String retrieveNews() {
+        final StringBuilder collectedNews = new StringBuilder();
+        final NewsRetriever newsRetriever = new NewsRetriever();
+        final Optional<News> optionalRetrievedNews = newsRetriever.retrieveTopStories();
 
-        // amdOUNB1YcVVQcHz8HMi07YcprB3hnwgoBfGPycM
+        if( optionalRetrievedNews.isPresent() && optionalRetrievedNews.get().meta().found() > 0 ) {
+            News retrievedNews = optionalRetrievedNews.get();
+            collectedNews.append("Found " ).append(retrievedNews.meta().limit()).append(" news.\n");
+            collectedNews.append(
+                    retrievedNews.data().stream().map(news -> news.title() + ". Details: " + news.description() + ". Source: " +
+                            news.source() + ". Published at: " + news.publishedAt()).collect(Collectors.joining("\n"))
+            );
 
-        OkHttpClient client = new OkHttpClient();
-
-        Request request = new Request.Builder()
-                .url("http://example.com/api/resource") // Replace with your API URL
-                .build();
-
-        try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
-
-            // For a string response body. For other types, you may use response.body().bytes() or .byteStream()
-            System.out.println(response.body().string());
-        } catch (Exception e) {
-            e.printStackTrace();
+            return collectedNews.toString();
         }
 
-        return "Latest News: President proclaims April 10th is a holiday.";
+        return "No news found at the moment.";
     }
     @Tool("Retrieves the latest weather.")
     public String retrieveWeather() {
@@ -44,4 +41,5 @@ public class CurrentInformationRetrieverService {
     public String retrieveTime() {
         return LocalDateTime.now().toString();
     }
+
 }
