@@ -14,8 +14,6 @@ public class NewsRetriever {
 
     private final SimpleHttpClient simpleHttpClient = new SimpleHttpClient();
 
-    // https://api.thenewsapi.com/v1/news/top?api_token=YOUR_API_TOKEN&locale=us&limit=3
-
     public Optional<News> retrieveTopStories() {
         UrlBuilder urlBuilder = new UrlBuilder(getProperty("assistant.api.news.url"))
                 .addPathSegments("top")
