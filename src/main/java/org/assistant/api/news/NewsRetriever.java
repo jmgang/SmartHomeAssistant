@@ -1,6 +1,6 @@
 package org.assistant.api.news;
 
-import org.assistant.api.SimpleHttpClient;
+import org.assistant.api.common.SimpleHttpClient;
 import org.assistant.api.common.UrlBuilder;
 
 import javax.swing.text.html.Option;

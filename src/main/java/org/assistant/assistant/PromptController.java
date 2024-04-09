@@ -6,6 +6,7 @@ import dev.langchain4j.model.output.structured.Description;
 import dev.langchain4j.service.AiServices;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
+import org.assistant.assistant.constants.Prompts;
 import org.assistant.assistant.rag.DocumentRetriever;
 import org.assistant.assistant.tools.CurrentInformationRetrieverService;
 import org.assistant.assistant.tools.EnvironmentRecognizerService;
@@ -14,6 +15,7 @@ import org.assistant.assistant.tools.SmartOutletManagerService;
 import java.util.Arrays;
 import java.util.List;
 
+import static dev.langchain4j.data.message.SystemMessage.systemMessage;
 import static java.time.Duration.ofSeconds;
 import static org.assistant.config.ConfigLoader.getProperty;
 
@@ -51,16 +53,19 @@ public class PromptController {
         var model = OpenAiChatModel.builder()
                 .apiKey(getProperty("assistant.openai.apikey"))
                 .timeout(ofSeconds(200))
-                //.logRequests(true)
+                .logRequests(true)
                 //.logResponses(true)
                 .build();
+
+        var chatMemory = MessageWindowChatMemory.withMaxMessages(10);
+        chatMemory.add(systemMessage(Prompts.SMART_HOME_ASST_SYS_MESSAGE));
 
         var assistant = AiServices.builder(Assistant.class)
                 .chatLanguageModel(model)
                 .tools(new CurrentInformationRetrieverService(),
                         new EnvironmentRecognizerService(),
                         new SmartOutletManagerService())
-                .chatMemory(MessageWindowChatMemory.withMaxMessages(10))
+                .chatMemory(chatMemory)
                 //.contentRetriever(DocumentRetriever.get())
                 .build();
 
@@ -68,8 +73,9 @@ public class PromptController {
 
         List<String> queries = Arrays.asList(
                 "Can you turn on the lights please?"
-//                , "What's the weather today?"
-                , "Give me a brief view of the news today"
+                , "What's the weather today?"
+                , "Why does it feel hot today?"
+//                , "Give me a brief view of the news today"
 //                , "Why is the sky blue?"
 //                , "What can you see?"
 //                , "What's today again?"

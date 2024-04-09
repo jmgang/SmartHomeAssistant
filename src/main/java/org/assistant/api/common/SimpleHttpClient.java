@@ -1,4 +1,4 @@
-package org.assistant.api;
+package org.assistant.api.common;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;

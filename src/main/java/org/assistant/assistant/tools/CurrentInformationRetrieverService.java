@@ -3,6 +3,8 @@ package org.assistant.assistant.tools;
 import dev.langchain4j.agent.tool.Tool;
 import org.assistant.api.news.News;
 import org.assistant.api.news.NewsRetriever;
+import org.assistant.api.weather.Weather;
+import org.assistant.api.weather.WeatherRetriever;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -29,12 +31,16 @@ public class CurrentInformationRetrieverService {
 
         return "No news found at the moment.";
     }
-    @Tool("Retrieves the latest weather.")
+    @Tool("Retrieves the latest weather data including the temperature, feels like, humidity, wind, etc.")
     public String retrieveWeather() {
-        return "Weather today is 34°C°F\n" +
-                "Precipitation: 10%\n" +
-                "Humidity: 67%\n" +
-                "Wind: 11 km/h";
+        final WeatherRetriever weatherRetriever = new WeatherRetriever();
+        Optional<Weather> currentWeather = weatherRetriever.retrieveCurrentWeather();
+
+        if(currentWeather.isPresent()) {
+            return currentWeather.get().toString();
+        }
+
+        return "No weather data available at the moment.";
     }
 
     @Tool("Retrieves the date and time.")
