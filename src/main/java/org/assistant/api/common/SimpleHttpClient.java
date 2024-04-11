@@ -1,10 +1,10 @@
 package org.assistant.api.common;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import okhttp3.*;
 
 import java.io.IOException;
 import java.util.Map;
@@ -17,6 +17,7 @@ public class SimpleHttpClient {
 
     public SimpleHttpClient() {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
     public <T> T sendGet(String url,  Class<T> responseType) throws IOException {
@@ -39,5 +40,38 @@ public class SimpleHttpClient {
             String responseBody = Objects.requireNonNull(response.body()).string();
             return objectMapper.readValue(responseBody, responseType); // Deserialize JSON string to Java object
         }
+    }
+
+    public <T, R> R sendPost(String url, Map<String, String> headers, T requestBodyObject, Class<R> responseType) throws IOException {
+        // Serialize the Java object to JSON string
+        String jsonBody = objectMapper.writeValueAsString(requestBodyObject);
+
+        System.out.println(jsonBody);
+
+        RequestBody body = RequestBody.create(jsonBody, MediaType.get("application/json; charset=utf-8"));
+
+        Request.Builder builder = new Request.Builder()
+                .url(url)
+                .post(body);
+
+        if (headers != null) {
+            headers.forEach(builder::addHeader);
+        }
+
+        Request request = builder.build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                throw new IOException("Unexpected code " + response);
+            }
+            String responseBody = Objects.requireNonNull(response.body()).string();
+            // Deserialize JSON response to Java object
+            return objectMapper.readValue(responseBody, responseType);
+        }
+    }
+
+
+    private String serializeToJson(Map<String, Object> data) throws JsonProcessingException {
+        return objectMapper.writeValueAsString(data);
     }
 }
