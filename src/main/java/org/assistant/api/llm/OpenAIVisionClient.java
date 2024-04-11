@@ -39,7 +39,7 @@ public class OpenAIVisionClient {
         OpenAIVisionClient openAIClient = new OpenAIVisionClient();
 
         try {
-            openAIClient.analyzeImage(Path.of("D:\\library\\Downloads\\434311022_2485844008270316_3926443807468102586_n.jpg"));
+            openAIClient.analyzeImage(Path.of("D:\\library\\Downloads\\433999893_941048247604337_895598583215439361_n.jpg"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
