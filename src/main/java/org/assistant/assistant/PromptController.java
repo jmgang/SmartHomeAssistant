@@ -53,7 +53,7 @@ public class PromptController {
         var model = OpenAiChatModel.builder()
                 .apiKey(getProperty("assistant.openai.apikey"))
                 .timeout(ofSeconds(200))
-                .logRequests(true)
+                //.logRequests(true)
                 //.logResponses(true)
                 .build();
 
@@ -73,12 +73,13 @@ public class PromptController {
 
         List<String> queries = Arrays.asList(
                 "Can you turn on the strip please?"
-                , "Turn on the second outlet."
+                , "Turn on the last outlet."
+                , "Just turn it off"
 //                , "What's the weather today?"
 //                , "Why does it feel hot today?"
 //                , "Give me a brief view of the news today"
 //                , "Why is the sky blue?"
-//                , "What can you see?"
+//                 , "What can you see?"
 //                , "What's today again?"
 //                , "Describe the room you are in"
 //                , "What are Emilio Aguinaldo College's linkages?"

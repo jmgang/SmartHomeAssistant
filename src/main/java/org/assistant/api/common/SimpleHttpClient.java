@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.*;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -80,14 +81,21 @@ public class SimpleHttpClient {
         }
 
         Request request = builder.build();
+
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
                 throw new IOException("Unexpected code " + response);
             }
             String responseBody = Objects.requireNonNull(response.body()).string();
+
+            // Log the response body
+            System.out.println("Response body:");
+            System.out.println(responseBody);
+
             return objectMapper.readValue(responseBody, typeReference);
         }
     }
+
 
     private String serializeToJson(Map<String, Object> data) throws JsonProcessingException {
         return objectMapper.writeValueAsString(data);

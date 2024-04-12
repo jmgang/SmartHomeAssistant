@@ -6,7 +6,8 @@ import java.util.Map;
 public record EntityStateChanged(
         @JsonProperty("entity_id") String entityId,
         @JsonProperty("state") String state,
-        @JsonProperty("attributes") Map<String, Object> attributes,
+        @JsonProperty("attributes") Map<String, Object> atdtributes,
         @JsonProperty("last_changed") String lastChanged,
-        @JsonProperty("last_updated") String lastUpdated) {
+        @JsonProperty("last_updated") String lastUpdate
+) {
 }
