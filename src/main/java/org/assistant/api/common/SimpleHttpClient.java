@@ -2,6 +2,7 @@ package org.assistant.api.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.*;
@@ -70,6 +71,23 @@ public class SimpleHttpClient {
         }
     }
 
+    public <T> T sendPost(String url, Map<String, String> headers, Object requestBodyObject, TypeReference<T> typeReference) throws IOException {
+        String jsonBody = objectMapper.writeValueAsString(requestBodyObject);
+        RequestBody body = RequestBody.create(jsonBody, MediaType.get("application/json; charset=utf-8"));
+        Request.Builder builder = new Request.Builder().url(url).post(body);
+        if (headers != null) {
+            headers.forEach(builder::addHeader);
+        }
+
+        Request request = builder.build();
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                throw new IOException("Unexpected code " + response);
+            }
+            String responseBody = Objects.requireNonNull(response.body()).string();
+            return objectMapper.readValue(responseBody, typeReference);
+        }
+    }
 
     private String serializeToJson(Map<String, Object> data) throws JsonProcessingException {
         return objectMapper.writeValueAsString(data);
