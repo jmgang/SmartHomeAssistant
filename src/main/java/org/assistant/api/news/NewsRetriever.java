@@ -1,9 +1,8 @@
 package org.assistant.api.news;
 
 import org.assistant.api.common.SimpleHttpClient;
-import org.assistant.api.common.UrlBuilder;
+import org.assistant.api.common.HttpRequestBuilder;
 
-import javax.swing.text.html.Option;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
@@ -15,7 +14,7 @@ public class NewsRetriever {
     private final SimpleHttpClient simpleHttpClient = new SimpleHttpClient();
 
     public Optional<News> retrieveTopStories() {
-        UrlBuilder urlBuilder = new UrlBuilder(getProperty("assistant.api.news.url"))
+        HttpRequestBuilder httpRequestBuilder = new HttpRequestBuilder(getProperty("assistant.api.news.url"))
                 .addPathSegments("top")
                 .addQueryParams(Map.of("api_token", getProperty("assistant.api.news.apikey"),
                                     "limit", getProperty("assistant.api.news.limit"),
@@ -23,7 +22,7 @@ public class NewsRetriever {
                                     "language", getProperty("assistant.api.news.language")));
 
         try {
-            return Optional.of(simpleHttpClient.sendGet(urlBuilder.build(), News.class));
+            return Optional.of(simpleHttpClient.sendGet(httpRequestBuilder.build(), News.class));
         }catch (IOException e) {
             e.printStackTrace();
         }

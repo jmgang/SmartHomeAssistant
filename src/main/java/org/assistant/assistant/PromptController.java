@@ -72,9 +72,10 @@ public class PromptController {
         var intentAssistant = AiServices.create(IntentControllerAssistant.class, model);
 
         List<String> queries = Arrays.asList(
-                "Can you turn on the lights please?"
-                , "What's the weather today?"
-                , "Why does it feel hot today?"
+                "Can you turn on the strip please?"
+                , "Turn on the second outlet."
+//                , "What's the weather today?"
+//                , "Why does it feel hot today?"
 //                , "Give me a brief view of the news today"
 //                , "Why is the sky blue?"
 //                , "What can you see?"

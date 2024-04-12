@@ -1,8 +1,7 @@
 package org.assistant.api.weather;
 
 import org.assistant.api.common.SimpleHttpClient;
-import org.assistant.api.common.UrlBuilder;
-import org.assistant.api.news.News;
+import org.assistant.api.common.HttpRequestBuilder;
 
 import java.io.IOException;
 import java.util.Map;
@@ -15,13 +14,13 @@ public class WeatherRetriever {
     private final SimpleHttpClient simpleHttpClient = new SimpleHttpClient();
 
     public Optional<Weather> retrieveCurrentWeather() {
-        UrlBuilder urlBuilder = new UrlBuilder(getProperty("assistant.api.weather.url"))
+        HttpRequestBuilder httpRequestBuilder = new HttpRequestBuilder(getProperty("assistant.api.weather.url"))
                 .addPathSegments("v1", "current.json")
                 .addQueryParams(Map.of("key", getProperty("assistant.api.weather.apikey"),
                         "q", getProperty("assistant.api.weather.query")));
 
         try {
-            return Optional.of(simpleHttpClient.sendGet(urlBuilder.build(), Weather.class));
+            return Optional.of(simpleHttpClient.sendGet(httpRequestBuilder.build(), Weather.class));
         }catch (IOException e) {
             e.printStackTrace();
         }
