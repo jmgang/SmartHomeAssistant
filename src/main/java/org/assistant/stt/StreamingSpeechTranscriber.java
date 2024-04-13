@@ -3,7 +3,7 @@
 
 package org.assistant.stt;
 
-import org.assistant.assistant.ConversationalAIAssistant;
+import org.assistant.assistant.core.SmartHomeAssistantManager;
 import org.assistant.tts.PollySpeaker;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
@@ -42,32 +42,6 @@ public class StreamingSpeechTranscriber {
     private static final Region REGION = Region.US_EAST_1;
     private static TranscribeStreamingAsyncClient client;
 
-    private static ConversationalAIAssistant assistant;
-
-    // private final TranscriptionResultHandler resultHandler;
-
-//    public StreamingSpeechTranscriber(TranscriptionResultHandler resultHandler) {
-//        this.resultHandler = resultHandler;
-//        this.client = TranscribeStreamingAsyncClient.builder()
-//                .credentialsProvider(getCredentials())
-//                .region(REGION)
-//                .build();
-//    }
-
-//    public void startTranscription() throws LineUnavailableException {
-//        CompletableFuture<Void> result = client.startStreamTranscription(
-//                getRequest(16_000),
-//                new AudioStreamPublisher(getStreamFromMic()),
-//                getResponseHandler());
-//
-//        result.whenComplete((r, e) -> {
-//            if (e != null) {
-//                resultHandler.onError((Exception) e);
-//            }
-//            client.close();
-//        });
-//    }
-
     public static void main(String args[])
             throws URISyntaxException, ExecutionException, InterruptedException, LineUnavailableException {
 
@@ -76,11 +50,11 @@ public class StreamingSpeechTranscriber {
                 .region(REGION)
                 .build();
 
-        assistant = new ConversationalAIAssistant();
+        var smartHomeAssistantManager = new SmartHomeAssistantManager();
 
         CompletableFuture<Void> result = client.startStreamTranscription(getRequest(16_000),
                 new AudioStreamPublisher(getStreamFromMic()),
-                getResponseHandler());
+                getResponseHandler(smartHomeAssistantManager));
 
         result.get();
         client.close();
@@ -118,7 +92,7 @@ public class StreamingSpeechTranscriber {
                 .build();
     }
 
-     private static StartStreamTranscriptionResponseHandler getResponseHandler() {
+     private static StartStreamTranscriptionResponseHandler getResponseHandler(SmartHomeAssistantManager smartHomeAssistantManager) {
         return StartStreamTranscriptionResponseHandler.builder()
                 .onResponse(r -> System.out.println("Received Initial response"))
                 .onError(e -> {
@@ -135,7 +109,7 @@ public class StreamingSpeechTranscriber {
                             String transcript = result.alternatives().get(0).transcript();
                             System.out.println("Transcript: " + transcript);
 
-                            String chatResponse = assistant.chat(transcript);
+                            String chatResponse = smartHomeAssistantManager.chat(transcript);
 
                             System.out.println("RESPONSE: " + chatResponse);
 

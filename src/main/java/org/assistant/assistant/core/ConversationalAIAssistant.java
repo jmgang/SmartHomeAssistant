@@ -1,4 +1,4 @@
-package org.assistant.assistant;
+package org.assistant.assistant.core;
 
 import dev.langchain4j.chain.ConversationalChain;
 import dev.langchain4j.data.document.loader.UrlDocumentLoader;
