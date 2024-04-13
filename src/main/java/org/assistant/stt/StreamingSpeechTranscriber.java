@@ -109,7 +109,7 @@ public class StreamingSpeechTranscriber {
                             String transcript = result.alternatives().get(0).transcript();
                             System.out.println("Transcript: " + transcript);
 
-                            String chatResponse = smartHomeAssistantManager.chat(transcript);
+                            String chatResponse = smartHomeAssistantManager.query(transcript);
 
                             System.out.println("RESPONSE: " + chatResponse);
 
