@@ -5,11 +5,10 @@ import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.service.AiServices;
 import org.assistant.assistant.constants.Prompts;
+import org.assistant.assistant.core.assistants.Intent;
 import org.assistant.assistant.core.assistants.IntentControllerAssistant;
-import org.assistant.assistant.core.assistants.SmartHomeAssistant;
-import org.assistant.assistant.tools.CurrentInformationRetrieverService;
-import org.assistant.assistant.tools.EnvironmentRecognizerService;
-import org.assistant.assistant.tools.SmartOutletManagerService;
+import org.assistant.assistant.core.assistants.service.ActionAIAssistantService;
+import org.assistant.assistant.core.assistants.service.ConversationalAIAssistantService;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,28 +21,26 @@ public class SmartHomeAssistantManager {
 
     private final ChatLanguageModel chatLanguageModel;
 
-    private final SmartHomeAssistant smartHomeAssistant;
+    private final ConversationalAIAssistantService conversationalAIAssistantService;
+
+    private final ActionAIAssistantService actionAIAssistantService;
+
+    private final IntentControllerAssistant intentControllerAssistant;
 
     public SmartHomeAssistantManager() {
         chatLanguageModel = OpenAiChatModel.builder()
                 .apiKey(getProperty("assistant.openai.apikey"))
                 .timeout(ofSeconds(200))
                 //.logRequests(true)
-                .logResponses(true)
+                //.logResponses(true)
                 .build();
 
         var chatMemory = MessageWindowChatMemory.withMaxMessages(10);
         chatMemory.add(systemMessage(Prompts.SMART_HOME_ASST_SYS_MESSAGE));
 
-        smartHomeAssistant = AiServices.builder(SmartHomeAssistant.class)
-                .chatLanguageModel(chatLanguageModel)
-                .tools(new CurrentInformationRetrieverService(),
-                        new EnvironmentRecognizerService(),
-                        new SmartOutletManagerService())
-                .chatMemory(chatMemory)
-                //.contentRetriever(DocumentRetriever.get())
-                .build();
-
+        conversationalAIAssistantService = new ConversationalAIAssistantService(chatLanguageModel, chatMemory);
+        actionAIAssistantService = new ActionAIAssistantService(chatLanguageModel, chatMemory);
+        intentControllerAssistant = AiServices.create(IntentControllerAssistant.class, chatLanguageModel);
     }
 
     public ChatLanguageModel model() {
@@ -51,13 +48,20 @@ public class SmartHomeAssistantManager {
     }
 
     public String query(String query) {
-        return smartHomeAssistant.chat(query);
+        Intent intent = intentControllerAssistant.specifyIntent(query);
+
+        System.out.println("Intent: " + intent);
+
+        if(intent == null || intent.isConversational()) {
+            return conversationalAIAssistantService.chat(query);
+        }
+
+        return actionAIAssistantService.sendActionCommand(query);
     }
 
 
     public static void main(String[] args) {
         SmartHomeAssistantManager smartHomeAssistantManager = new SmartHomeAssistantManager();
-        var intentAssistant = AiServices.create(IntentControllerAssistant.class, smartHomeAssistantManager.model());
 
         List<String> queries = Arrays.asList(
                 "Can you turn on the strip please?"
@@ -76,7 +80,7 @@ public class SmartHomeAssistantManager {
 
         for(String s: queries) {
             System.out.println("[USER]: " + s + "\n[LLM]: " +
-                    intentAssistant.specifyIntent(s) +
+                    smartHomeAssistantManager.query(s) +
                     //assistant.chat(s) +
                     "\n");
         }

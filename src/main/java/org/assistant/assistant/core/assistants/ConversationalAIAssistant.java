@@ -1,5 +1,5 @@
 package org.assistant.assistant.core.assistants;
 
-public interface SmartHomeAssistant {
+public interface ConversationalAIAssistant {
     String chat(String message);
 }
