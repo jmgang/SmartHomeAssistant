@@ -113,7 +113,7 @@ public class SmartHomeAssistantManager {
                 System.out.println("USER: " + qry);
                 var response = this.query(qry);
                 System.out.println("LLM: " + response + "\n");
-                PollySpeaker.talk(response);
+                //PollySpeaker.talk(response);
 
                 input = sc.nextLine();
             }catch (NoSuchElementException e) {
@@ -127,19 +127,20 @@ public class SmartHomeAssistantManager {
         SmartHomeAssistantManager smartHomeAssistantManager = new SmartHomeAssistantManager();
 
         List<String> queries = Arrays.asList(
-                "Hello what are u",
-                "I will kill you!"
+               // "Hello what are u",
+               // "I will kill you!"
 //                "Can you turn on the strip please?"
 //                , "Turn on the last outlet."
-//                , "Just turn it off"
 //                , "What's the weather today?"
-//                , "Why does it feel hot today?"
+//                , "You can turn off the outlet now."
 //                , "Give me a brief view of the news today"
-//                , "Why is the sky blue?"
+//                , "Why is the sky blue? Give only 1 line."
 //                 , "What can you see?"
 //                , "What's today again?"
 //                , "Describe the room you are in"
-                // , "What are Emilio Aguinaldo College's linkages?"
+                //"Tell me who is the community partner of the Advanced Minds Conference?",
+                "Can you Tell me more information about the conference such as the schedule. Leave out the " +
+                        "timezone. Make it only 1 line with only the significant information."
         );
 
         smartHomeAssistantManager.runFromKeyboard(queries);
