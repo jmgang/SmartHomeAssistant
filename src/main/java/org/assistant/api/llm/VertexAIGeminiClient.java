@@ -42,7 +42,7 @@ public class VertexAIGeminiClient {
             GenerateContentResponse response = model.generateContent(
                     ContentMaker.fromMultiModalData(
                             "You are a sign language expert. A person in this video is doing sign language. " +
-                                    "Tell me what the person says.",
+                                    "Tell me what the person signs.",
                             PartMaker.fromMimeTypeAndData("video/mp4", videoUri)
                     ));
 

@@ -9,9 +9,9 @@ import org.assistant.assistant.core.assistants.Intent;
 import org.assistant.assistant.core.assistants.IntentControllerAssistant;
 import org.assistant.assistant.core.assistants.service.ActionAIAssistantService;
 import org.assistant.assistant.core.assistants.service.ConversationalAIAssistantService;
+import org.assistant.tts.PollySpeaker;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static dev.langchain4j.data.message.SystemMessage.systemMessage;
 import static java.time.Duration.ofSeconds;
@@ -59,6 +59,32 @@ public class SmartHomeAssistantManager {
         return actionAIAssistantService.sendActionCommand(query);
     }
 
+    public void runFromKeyboard(List<String> queries) {
+        Scanner sc = new Scanner(System.in);
+        String input = sc.nextLine();
+        Iterator<String> queryIterator = queries.listIterator();
+
+        while(true) {
+            try {
+                if(input.trim().isEmpty()) {
+                    if(!queryIterator.hasNext()) {
+                        break;
+                    }
+
+                    var q = queryIterator.next();
+                    System.out.println("USER: " + q);
+                    var response = this.query(q);
+                    System.out.println("LLM: " + response + "\n");
+                    PollySpeaker.talk(response);
+                }
+
+                input = sc.nextLine();
+            }catch (NoSuchElementException e) {
+                break;
+            }
+        }
+    }
+
 
     public static void main(String[] args) {
         SmartHomeAssistantManager smartHomeAssistantManager = new SmartHomeAssistantManager();
@@ -77,13 +103,14 @@ public class SmartHomeAssistantManager {
                 , "What are Emilio Aguinaldo College's linkages?"
         );
 
+        smartHomeAssistantManager.runFromKeyboard(queries);
 
-        for(String s: queries) {
-            System.out.println("[USER]: " + s + "\n[LLM]: " +
-                    smartHomeAssistantManager.query(s) +
-                    //assistant.chat(s) +
-                    "\n");
-        }
+//        for(String s: queries) {
+//            System.out.println("[USER]: " + s + "\n[LLM]: " +
+//                    smartHomeAssistantManager.query(s) +
+//                    //assistant.chat(s) +
+//                    "\n");
+//        }
     }
 
 }
