@@ -14,6 +14,8 @@ import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.transcribestreaming.TranscribeStreamingAsyncClient;
 import software.amazon.awssdk.services.transcribestreaming.model.*;
+import software.amazon.awssdk.http.nio.netty.NettyNioAsyncHttpClient;
+
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -31,6 +33,7 @@ import java.io.StringWriter;
 import java.io.UncheckedIOException;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -45,9 +48,16 @@ public class StreamingSpeechTranscriber {
     public static void main(String args[])
             throws URISyntaxException, ExecutionException, InterruptedException, LineUnavailableException {
 
+        var httpClient = NettyNioAsyncHttpClient.builder()
+                .connectionTimeout(Duration.ofSeconds(15))
+                .writeTimeout(Duration.ofSeconds(15))
+                .readTimeout(Duration.ofSeconds(30))
+                .build();
+
         client = TranscribeStreamingAsyncClient.builder()
                 .credentialsProvider(getCredentials())
                 .region(REGION)
+                //.httpClient(httpClient)
                 .build();
 
         var smartHomeAssistantManager = new SmartHomeAssistantManager();

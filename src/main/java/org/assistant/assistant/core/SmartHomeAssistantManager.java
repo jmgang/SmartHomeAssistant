@@ -66,17 +66,21 @@ public class SmartHomeAssistantManager {
 
         while(true) {
             try {
+                var qry = "";
                 if(input.trim().isEmpty()) {
                     if(!queryIterator.hasNext()) {
                         break;
                     }
 
-                    var q = queryIterator.next();
-                    System.out.println("USER: " + q);
-                    var response = this.query(q);
-                    System.out.println("LLM: " + response + "\n");
-                    PollySpeaker.talk(response);
+                    qry = queryIterator.next();
+                }else {
+                    qry = input.trim();
                 }
+
+                System.out.println("USER: " + qry);
+                var response = this.query(qry);
+                System.out.println("LLM: " + response + "\n");
+                PollySpeaker.talk(response);
 
                 input = sc.nextLine();
             }catch (NoSuchElementException e) {
@@ -90,6 +94,7 @@ public class SmartHomeAssistantManager {
         SmartHomeAssistantManager smartHomeAssistantManager = new SmartHomeAssistantManager();
 
         List<String> queries = Arrays.asList(
+                "Hello what are u",
                 "Can you turn on the strip please?"
                 , "Turn on the last outlet."
                 , "Just turn it off"
@@ -100,7 +105,7 @@ public class SmartHomeAssistantManager {
                  , "What can you see?"
                 , "What's today again?"
                 , "Describe the room you are in"
-                , "What are Emilio Aguinaldo College's linkages?"
+                // , "What are Emilio Aguinaldo College's linkages?"
         );
 
         smartHomeAssistantManager.runFromKeyboard(queries);

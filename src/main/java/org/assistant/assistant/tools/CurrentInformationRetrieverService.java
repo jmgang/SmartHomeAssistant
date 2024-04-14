@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class CurrentInformationRetrieverService {
 
-    @Tool("Retrieves the latest news.")
+    @Tool("Retrieves the latest news. Summarize the highlights into 2 lines only.")
     public String retrieveNews() {
         final StringBuilder collectedNews = new StringBuilder();
         final NewsRetriever newsRetriever = new NewsRetriever();
