@@ -3,7 +3,6 @@ package org.assistant.assistant.core.assistants;
 import dev.langchain4j.service.UserMessage;
 
 public interface IntentControllerAssistant {
-
     @UserMessage("Your role is to specify the intent of a given query for a smart home assistant with camera: {{it}}. " +
             "Your only response should only be one of the ff. intents: " +
             "CONVERSATIONAL_INTENT, TOGGLE_OUTLET_INTENT, INQUIRE_WEATHER_INTENT, INQUIRE_DATETIME_INTENT, INQUIRE_NEWS_INTENT, SEE_INTENT " +
