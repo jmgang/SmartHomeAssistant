@@ -25,6 +25,7 @@ To get started with the Smart Home Assistant, clone this repository and follow t
 ```bash
 git clone https://github.com/yourusername/smarthome-assistant.git
 cd smarthome-assistant
+```
 
 ## License
 Distributed under the MIT License. See LICENSE for more information.
